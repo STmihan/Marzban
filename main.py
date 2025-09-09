@@ -9,7 +9,7 @@ from cryptography.hazmat.backends import default_backend
 
 from app import app, logger
 from config import (DEBUG, UVICORN_HOST, UVICORN_PORT, UVICORN_SSL_CERTFILE,
-                    UVICORN_SSL_KEYFILE, UVICORN_SSL_CA_TYPE, UVICORN_UDS)
+                    UVICORN_SSL_KEYFILE, UVICORN_SSL_CA_TYPE, UVICORN_UDS, UVICORN_IGNORE_SSL)
 
 
 def validate_cert_and_key(cert_file_path, key_file_path, ca_type):
@@ -65,11 +65,12 @@ if __name__ == "__main__":
             bind_args['port'] = UVICORN_PORT
 
     else:
-        if UVICORN_UDS:
-            bind_args['uds'] = UVICORN_UDS
-        else:
+        if not UVICORN_IGNORE_SSL:
+            if UVICORN_UDS:
+                bind_args['uds'] = UVICORN_UDS
+            else:
 
-            logger.warning(f"""
+                logger.warning(f"""
 {click.style('IMPORTANT!', blink=True, bold=True, fg="yellow")}
 You're running Marzban without specifying {click.style('UVICORN_SSL_CERTFILE', italic=True, fg="magenta")} and {click.style('UVICORN_SSL_KEYFILE', italic=True, fg="magenta")}.
 The application will only be accessible through localhost. This means that {click.style('Marzban and subscription URLs will not be accessible externally', bold=True)}.
@@ -85,10 +86,10 @@ Use the following command:
 Then, navigate to {click.style(f'http://127.0.0.1:{UVICORN_PORT}', bold=True)} on your computer.
             """)
 
-            bind_args['host'] = '127.0.0.1'
-            bind_args['port'] = UVICORN_PORT
+                bind_args['host'] = '127.0.0.1'
+                bind_args['port'] = UVICORN_PORT
 
-    if DEBUG:
+    if DEBUG or UVICORN_IGNORE_SSL:
         bind_args['uds'] = None
         bind_args['host'] = '0.0.0.0'
 
