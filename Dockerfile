@@ -1,6 +1,4 @@
-ARG PYTHON_VERSION=3.12
-
-FROM python:$PYTHON_VERSION-slim AS build
+FROM python:3.12-slim AS build
 
 ENV PYTHONUNBUFFERED=1
 
@@ -15,9 +13,9 @@ COPY ./requirements.txt /code/
 RUN python3 -m pip install --upgrade pip setuptools \
     && pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-FROM python:$PYTHON_VERSION-slim
+FROM python:3.12-slim
 
-ENV PYTHON_LIB_PATH=/usr/local/lib/python${PYTHON_VERSION%.*}/site-packages
+ENV PYTHON_LIB_PATH=/usr/local/lib/python3.12/site-packages
 WORKDIR /code
 
 RUN rm -rf $PYTHON_LIB_PATH/*

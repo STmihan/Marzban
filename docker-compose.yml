@@ -4,7 +4,6 @@ services:
     container_name: marzban
     restart: always
     env_file: .env
-    network_mode: host
     volumes:
       - /var/lib/marzban:/var/lib/marzban
       - ./db:/code/db
