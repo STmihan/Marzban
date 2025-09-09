@@ -4,6 +4,9 @@ services:
     container_name: marzban
     restart: always
     env_file: .env
+    ports:
+      - "8000:8000"
+      - "10444:10444"
     volumes:
       - /var/lib/marzban:/var/lib/marzban
       - ./db:/code/db
