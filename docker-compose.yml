@@ -3,7 +3,6 @@ services:
     build: .
     container_name: marzban
     restart: always
-    env_file: marzban.env
     volumes:
       - /var/lib/marzban:/var/lib/marzban
       - /marzban/db:/code/db
