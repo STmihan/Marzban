@@ -3,11 +3,47 @@ services:
     build: .
     container_name: marzban
     restart: always
-    env_file: .env
-    ports:
-      - "8000:8000"
-      - "10444:10444"
+    env_file: marzban.env
     volumes:
       - /var/lib/marzban:/var/lib/marzban
-      - ./db:/code/db
-      - ./config:/code/config
+      - /marzban/db:/code/db
+      - /marzban/config:/code/config
+    networks:
+      - proxy
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.marzban.rule=Host(`marzban.stmihan.com`)"
+      - "traefik.http.routers.marzban.entrypoints=websecure"
+      - "traefik.http.routers.marzban.tls.certresolver=resolver"
+
+      - "traefik.http.routers.marzban-2.rule=Host(`subs.visiondl.net`) && PathPrefix(`/sub/`)"
+      - "traefik.http.routers.marzban-2.entrypoints=websecure"
+      - "traefik.http.routers.marzban-2.tls.certresolver=resolver"
+
+      - "traefik.http.services.marzban.loadbalancer.server.port=8000"
+
+      - "traefik.tcp.routers.xray-yandex.rule=HostSNI(`yandex.com`)"
+      - "traefik.tcp.routers.xray-yandex.entrypoints=websecure"
+      - "traefik.tcp.routers.xray-yandex.tls.passthrough=true"
+      - "traefik.tcp.services.xray-yandex.loadbalancer.server.port=10444"
+    environment:
+      UVICORN_HOST: "0.0.0.0"
+      UVICORN_PORT: 8000
+      UVICORN_IGNORE_SSL: "True"
+      ALLOWED_ORIGINS: "https://marzban.stmihan.com"
+      SQLALCHEMY_DATABASE_URL: "sqlite:///db/db.sqlite3"
+      JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 900
+      XRAY_SUBSCRIPTION_URL_PREFIX: "https://subs.visiondl.net"
+      XRAY_SUBSCRIPTION_PATH: "sub"
+      XRAY_JSON: "config/xray_config.json"
+
+
+networks:
+  proxy:
+    external: true
