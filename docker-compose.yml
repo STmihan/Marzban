@@ -4,8 +4,8 @@ services:
     restart: always
     volumes:
       - /var/lib/marzban:/var/lib/marzban
-      - /marzban/db:/code/db
-      - /marzban/config:/code/config
+      - /apps/marzban/db:/code/db
+      - /apps/marzban/config:/code/config
     networks:
       - proxy
     deploy:
@@ -39,7 +39,7 @@ services:
       JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 900
       XRAY_SUBSCRIPTION_URL_PREFIX: "https://subs.visiondl.net"
       XRAY_SUBSCRIPTION_PATH: "sub"
-      XRAY_JSON: "config/xray_config.json"
+      XRAY_JSON: "/code/config/xray_config.json"
 
 
 networks:
