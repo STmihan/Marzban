@@ -1,7 +1,6 @@
 services:
   marzban:
     build: .
-    container_name: marzban
     restart: always
     volumes:
       - /var/lib/marzban:/var/lib/marzban
